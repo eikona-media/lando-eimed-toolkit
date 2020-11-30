@@ -29,3 +29,15 @@ tooling:
 ```
 
 Now you should be able to call `lando sync` in your project!
+
+#### Advanced usage 
+
+You can override variables in your own `.lando.local.yml` - e.g.
+````
+services:
+    appserver:
+        overrides:
+            environment:
+                SYNC_SSH_USER: "xxxxx"
+                SYNC_REMOTE_USE_SUDO: ""
+````

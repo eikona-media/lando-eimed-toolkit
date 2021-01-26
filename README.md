@@ -10,6 +10,10 @@ Clone the repository to your plugins directory:
 ```
 git clone git@github.com:eikona-media/lando-eimed-toolkit.git ~/.lando/plugins/lando-eimed-toolkit
 ```
+or clone with https:
+```
+git clone https://github.com/eikona-media/lando-eimed-toolkit.git ~/.lando/plugins/lando-eimed-toolkit
+```
 
 Copy the configuration [sync.env](scripts/sync.env) to your project:
 ```

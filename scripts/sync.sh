@@ -42,10 +42,10 @@ doSyncRemote2Local() {
   doValidateParams
   if [ "$SYNC_DO_DB_SYNC" == "true" ]; then
     lando_yellow "Dumping database to $SYNC_DB_SOURCE_DUMP_FILE"
-    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_SOURCE_CRED | gzip -9 -c\" > $SYNC_DB_SOURCE_DUMP_FILE"
+    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_SOURCE_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c\" > $SYNC_DB_SOURCE_DUMP_FILE"
 
     lando_yellow "Dumping database to $SYNC_DB_TARGET_DUMP_FILE"
-    eval "mysqldump --compress $SYNC_DB_TARGET_CRED | gzip -9 -c > $SYNC_DB_TARGET_DUMP_FILE"
+    eval "mysqldump --compress $SYNC_DB_TARGET_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c > $SYNC_DB_TARGET_DUMP_FILE"
 
     lando_pink "Importing database"
     eval "gunzip -c < $SYNC_DB_SOURCE_DUMP_FILE | mysql $SYNC_DB_TARGET_CRED"
@@ -77,10 +77,10 @@ doSyncRemote2Remote() {
   doValidateParams
   if [ "$SYNC_DO_DB_SYNC" == "true" ]; then
     lando_yellow "Dumping database to $SYNC_DB_SOURCE_DUMP_FILE"
-    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_SOURCE_CRED | gzip -9 -c\" > $SYNC_DB_SOURCE_DUMP_FILE"
+    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_SOURCE_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c\" > $SYNC_DB_SOURCE_DUMP_FILE"
 
     lando_yellow "Dumping database to $SYNC_DB_TARGET_DUMP_FILE"
-    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_TARGET_CRED | gzip -9 -c\" > $SYNC_DB_TARGET_DUMP_FILE"
+    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_TARGET_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c\" > $SYNC_DB_TARGET_DUMP_FILE"
 
     lando_pink "Importing database"
     eval "scp $SYNC_DB_SOURCE_DUMP_FILE $SYNC_SSH_USER@$SYNC_SERVER:~/"
@@ -114,10 +114,10 @@ doSyncLocal2Remote() {
   doValidateParams
   if [ "$SYNC_DO_DB_SYNC" == "true" ]; then
     lando_yellow "Dumping database to $SYNC_DB_SOURCE_DUMP_FILE"
-    eval "mysqldump --compress $SYNC_DB_SOURCE_CRED | gzip -9 -c > $SYNC_DB_SOURCE_DUMP_FILE"
+    eval "mysqldump --compress $SYNC_DB_SOURCE_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c > $SYNC_DB_SOURCE_DUMP_FILE"
 
     lando_yellow "Dumping database to $SYNC_DB_TARGET_DUMP_FILE"
-    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_TARGET_CRED | gzip -9 -c\" > $SYNC_DB_TARGET_DUMP_FILE"
+    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_TARGET_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c\" > $SYNC_DB_TARGET_DUMP_FILE"
 
     lando_pink "Importing database"
     eval "scp $SYNC_DB_SOURCE_DUMP_FILE $SYNC_SSH_USER@$SYNC_SERVER:~/"

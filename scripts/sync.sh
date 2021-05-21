@@ -207,6 +207,30 @@ prod2stage() {
   doSyncRemote2Remote
 }
 
+stage2dev() {
+  SYNC_DB_SOURCE_CRED="-h $SYNC_STAGE_DB_HOST -P $SYNC_STAGE_DB_PORT -u $SYNC_STAGE_DB_USER -p'$SYNC_STAGE_DB_PASS' $SYNC_STAGE_DB_NAME"
+  SYNC_DB_TARGET_CRED="-h $SYNC_DEV_DB_HOST -P $SYNC_DEV_DB_PORT -u $SYNC_DEV_DB_USER -p'$SYNC_DEV_DB_PASS' $SYNC_DEV_DB_NAME"
+  SYNC_DB_SOURCE_DUMP_FILE="db-stage-$NOW-$SYNC_STAGE_DB_NAME.sql.gz"
+  SYNC_DB_TARGET_DUMP_FILE="db-dev-$NOW-$SYNC_DEV_DB_NAME.sql.gz"
+  SYNC_FILES_SOURCE_PATHS=("${SYNC_STAGE_FILES_PATHS[@]}")
+  SYNC_FILES_TARGET_PATHS=("${SYNC_DEV_FILES_PATHS[@]}")
+  SYNC_PHP_BINARY="$SYNC_REMOTE_PHP_BINARY"
+  SYNC_PROJECT_PATH="$SYNC_DEV_PROJECT_PATH"
+  doSyncRemote2Remote
+}
+
+dev2stage() {
+  SYNC_DB_SOURCE_CRED="-h $SYNC_DEV_DB_HOST -P $SYNC_DEV_DB_PORT -u $SYNC_DEV_DB_USER -p'$SYNC_DEV_DB_PASS' $SYNC_DEV_DB_NAME"
+  SYNC_DB_TARGET_CRED="-h $SYNC_STAGE_DB_HOST -P $SYNC_STAGE_DB_PORT -u $SYNC_STAGE_DB_USER -p'$SYNC_STAGE_DB_PASS' $SYNC_STAGE_DB_NAME"
+  SYNC_DB_SOURCE_DUMP_FILE="db-dev-$NOW-$SYNC_DEV_DB_NAME.sql.gz"
+  SYNC_DB_TARGET_DUMP_FILE="db-stage-$NOW-$SYNC_STAGE_DB_NAME.sql.gz"
+  SYNC_FILES_SOURCE_PATHS=("${SYNC_DEV_FILES_PATHS[@]}")
+  SYNC_FILES_TARGET_PATHS=("${SYNC_STAGE_FILES_PATHS[@]}")
+  SYNC_PHP_BINARY="$SYNC_REMOTE_PHP_BINARY"
+  SYNC_PROJECT_PATH="$SYNC_DEV_PROJECT_PATH"
+  doSyncRemote2Remote
+}
+
 local2dev() {
   SYNC_DB_SOURCE_CRED="-h $SYNC_LOCAL_DB_HOST -P $SYNC_LOCAL_DB_PORT -u$SYNC_LOCAL_DB_USER -p'$SYNC_LOCAL_DB_PASS' $SYNC_LOCAL_DB_NAME"
   SYNC_DB_TARGET_CRED="-h $SYNC_DEV_DB_HOST -P $SYNC_DEV_DB_PORT -u $SYNC_DEV_DB_USER -p'$SYNC_DEV_DB_PASS' $SYNC_DEV_DB_NAME"
@@ -231,9 +255,13 @@ show_menus() {
   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
   lando_yellow " 4. PROD  > DEV"
   lando_yellow " 5. PROD  > STAGE"
-  lando_yellow " 6. LOCAL > DEV"
   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-  echo " 7. Exit"
+  lando_yellow " 6. STAGE > DEV"
+  lando_yellow " 7. DEV > STAGE"
+  echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+  lando_yellow " 8. LOCAL > DEV"
+  echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+  echo " 9. Exit"
   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
   lando_green "Options:"
   echo "--no-db         Skip the database sync"
@@ -244,15 +272,17 @@ show_menus() {
 
 read_options() {
   local choice
-  read -p "Enter choice [ 1 - 6 ] " choice
+  read -p "Enter choice [ 1 - 8 ] " choice
   case $choice in
   1) prod2local ;;
   2) stage2local ;;
   3) dev2local ;;
   4) prod2dev ;;
   5) prod2stage ;;
-  6) local2dev ;;
-  7) exit 0 ;;
+  6) stage2dev ;;
+  7) dev2stage ;;
+  8) local2dev ;;
+  9) exit 0 ;;
   *) lando_red -e "Only Numbers please..." && sleep 1 ;;
   esac
 }

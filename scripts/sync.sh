@@ -70,7 +70,7 @@ doSyncRemote2Local() {
 
   lando_green "Utinni!"
 
-  exit 1
+  exit 0
 }
 
 doSyncRemote2Remote() {
@@ -107,7 +107,7 @@ doSyncRemote2Remote() {
 
   lando_green "Utinni!"
 
-  exit 1
+  exit 0
 }
 
 doSyncLocal2Remote() {
@@ -144,7 +144,7 @@ doSyncLocal2Remote() {
 
   lando_green "Utinni!"
 
-  exit 1
+  exit 0
 }
 
 prod2local() {

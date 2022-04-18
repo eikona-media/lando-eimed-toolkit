@@ -57,6 +57,8 @@ doSyncRemote2Local() {
         lando_pink "Rsync ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
         eval "rsync -a --info=progress2 --delete --rsync-path=\"$SYNC_REMOTE_USE_SUDO rsync\" -e ssh $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}"
       else
+        lando_pink "Remove ${SYNC_FILES_TARGET_PATHS[i]}"
+        eval "rm -rf ${SYNC_FILES_TARGET_PATHS[i]}"
         lando_pink "Scp ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
         eval "scp -rCq $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}"
       fi
@@ -94,6 +96,8 @@ doSyncRemote2Remote() {
         lando_pink "Rsync ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
         eval "ssh $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO rsync -aL --info=progress2 --delete ${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}'"
       else
+        lando_pink "Remove ${SYNC_FILES_TARGET_PATHS[i]}"
+        eval "ssh $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO rm -rf ${SYNC_FILES_TARGET_PATHS[i]}'"
         lando_pink "Copy ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
         eval "ssh $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO cp -r ${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}'"
       fi
@@ -131,6 +135,8 @@ doSyncLocal2Remote() {
         lando_pink "Rsync ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
         eval "rsync --chown=$SYNC_REMOTE_FILES_RSYNC_CHOWN --chmod=$SYNC_REMOTE_FILES_RSYNC_CHMOD -a --info=progress2 --delete --rsync-path=\"$SYNC_REMOTE_USE_SUDO rsync\" -e ssh ${SYNC_FILES_SOURCE_PATHS[i]} $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_TARGET_PATHS[i]}"
       else
+        lando_pink "Remove ${SYNC_FILES_TARGET_PATHS[i]}"
+        eval "ssh $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO rm -rf ${SYNC_FILES_TARGET_PATHS[i]}'"
         lando_pink "Scp ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
         eval "scp -rCq ${SYNC_FILES_SOURCE_PATHS[i]} $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_TARGET_PATHS[i]}"
       fi

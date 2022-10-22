@@ -42,25 +42,25 @@ doSyncRemote2Local() {
   doValidateParams
   if [ "$SYNC_DO_DB_SYNC" == "true" ]; then
     lando_yellow "Dumping database to $SYNC_DB_SOURCE_DUMP_FILE"
-    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_SOURCE_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c\" > $SYNC_DB_SOURCE_DUMP_FILE"
+    eval "ssh $SYNC_VERBOSE -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump $SYNC_VERBOSE --compress $SYNC_DB_SOURCE_CRED $SYNC_DB_DUMP_PARAMS | gzip $SYNC_VERBOSE -9 -c\" > $SYNC_DB_SOURCE_DUMP_FILE"
 
     lando_yellow "Dumping database to $SYNC_DB_TARGET_DUMP_FILE"
-    eval "mysqldump --compress $SYNC_DB_TARGET_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c > $SYNC_DB_TARGET_DUMP_FILE"
+    eval "mysqldump $SYNC_VERBOSE --compress $SYNC_DB_TARGET_CRED $SYNC_DB_DUMP_PARAMS | gzip $SYNC_VERBOSE -9 -c > $SYNC_DB_TARGET_DUMP_FILE"
 
     lando_pink "Importing database"
-    eval "gunzip -c < $SYNC_DB_SOURCE_DUMP_FILE | mysql $SYNC_DB_TARGET_CRED"
+    eval "gunzip $SYNC_VERBOSE -c < $SYNC_DB_SOURCE_DUMP_FILE | mysql $SYNC_VERBOSE $SYNC_DB_TARGET_CRED"
   fi
 
   if [ "$SYNC_DO_FILES_SYNC" == "true" ]; then
     for i in "${!SYNC_FILES_SOURCE_PATHS[@]}"; do
       if [ "$SYNC_REMOTE_HAS_RSYNC" == "true" ]; then
         lando_pink "Rsync ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
-        eval "rsync -a --info=progress2 --delete --rsync-path=\"$SYNC_REMOTE_USE_SUDO rsync\" -e ssh $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}"
+        eval "rsync $SYNC_VERBOSE -a --info=progress2 --delete --rsync-path=\"$SYNC_REMOTE_USE_SUDO rsync\" -e ssh $SYNC_VERBOSE $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}"
       else
         lando_pink "Remove ${SYNC_FILES_TARGET_PATHS[i]}"
         eval "rm -rf ${SYNC_FILES_TARGET_PATHS[i]}"
         lando_pink "Scp ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
-        eval "scp -rCq $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}"
+        eval "scp $SYNC_VERBOSE -rCq $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}"
       fi
     done
   fi
@@ -79,34 +79,34 @@ doSyncRemote2Remote() {
   doValidateParams
   if [ "$SYNC_DO_DB_SYNC" == "true" ]; then
     lando_yellow "Dumping database to $SYNC_DB_SOURCE_DUMP_FILE"
-    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_SOURCE_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c\" > $SYNC_DB_SOURCE_DUMP_FILE"
+    eval "ssh $SYNC_VERBOSE -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump $SYNC_VERBOSE --compress $SYNC_DB_SOURCE_CRED $SYNC_DB_DUMP_PARAMS | gzip $SYNC_VERBOSE -9 -c\" > $SYNC_DB_SOURCE_DUMP_FILE"
 
     lando_yellow "Dumping database to $SYNC_DB_TARGET_DUMP_FILE"
-    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_TARGET_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c\" > $SYNC_DB_TARGET_DUMP_FILE"
+    eval "ssh $SYNC_VERBOSE -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump $SYNC_VERBOSE --compress $SYNC_DB_TARGET_CRED $SYNC_DB_DUMP_PARAMS | gzip $SYNC_VERBOSE -9 -c\" > $SYNC_DB_TARGET_DUMP_FILE"
 
     lando_pink "Importing database"
-    eval "scp $SYNC_DB_SOURCE_DUMP_FILE $SYNC_SSH_USER@$SYNC_SERVER:~/"
-    eval "ssh $SYNC_SSH_USER@$SYNC_SERVER \"gunzip -c < $SYNC_DB_SOURCE_DUMP_FILE | mysql $SYNC_DB_TARGET_CRED\""
-    eval "ssh $SYNC_SSH_USER@$SYNC_SERVER \"rm $SYNC_DB_SOURCE_DUMP_FILE\""
+    eval "scp $SYNC_VERBOSE $SYNC_DB_SOURCE_DUMP_FILE $SYNC_SSH_USER@$SYNC_SERVER:~/"
+    eval "ssh $SYNC_VERBOSE $SYNC_SSH_USER@$SYNC_SERVER \"gunzip $SYNC_VERBOSE -c < $SYNC_DB_SOURCE_DUMP_FILE | mysql $SYNC_VERBOSE $SYNC_DB_TARGET_CRED\""
+    eval "ssh $SYNC_VERBOSE $SYNC_SSH_USER@$SYNC_SERVER \"rm $SYNC_DB_SOURCE_DUMP_FILE\""
   fi
 
   if [ "$SYNC_DO_FILES_SYNC" == "true" ]; then
     for i in "${!SYNC_FILES_SOURCE_PATHS[@]}"; do
       if [ "$SYNC_REMOTE_HAS_RSYNC" == "true" ]; then
         lando_pink "Rsync ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
-        eval "ssh $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO rsync -aL --info=progress2 --delete ${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}'"
+        eval "ssh $SYNC_VERBOSE $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO rsync $SYNC_VERBOSE -aL --info=progress2 --delete ${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}'"
       else
         lando_pink "Remove ${SYNC_FILES_TARGET_PATHS[i]}"
-        eval "ssh $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO rm -rf ${SYNC_FILES_TARGET_PATHS[i]}'"
+        eval "ssh $SYNC_VERBOSE $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO rm -rf ${SYNC_FILES_TARGET_PATHS[i]}'"
         lando_pink "Copy ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
-        eval "ssh $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO cp -r ${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}'"
+        eval "ssh $SYNC_VERBOSE $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO cp -r ${SYNC_FILES_SOURCE_PATHS[i]} ${SYNC_FILES_TARGET_PATHS[i]}'"
       fi
     done
   fi
 
   if [ ! -z "$SYNC_MIGRATION_CMD" ] && [ "$SYNC_DO_MIGRATION" == "true" ]; then
     lando_pink "Run migration in $SYNC_PROJECT_PATH"
-    eval "ssh $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO ${SYNC_PHP_BINARY} ${SYNC_PROJECT_PATH}${SYNC_MIGRATION_CMD}'"
+    eval "ssh $SYNC_VERBOSE $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO ${SYNC_PHP_BINARY} ${SYNC_PROJECT_PATH}${SYNC_MIGRATION_CMD}'"
   fi
 
   lando_green "Utinni!"
@@ -118,34 +118,34 @@ doSyncLocal2Remote() {
   doValidateParams
   if [ "$SYNC_DO_DB_SYNC" == "true" ]; then
     lando_yellow "Dumping database to $SYNC_DB_SOURCE_DUMP_FILE"
-    eval "mysqldump --compress $SYNC_DB_SOURCE_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c > $SYNC_DB_SOURCE_DUMP_FILE"
+    eval "mysqldump $SYNC_VERBOSE --compress $SYNC_DB_SOURCE_CRED $SYNC_DB_DUMP_PARAMS | gzip $SYNC_VERBOSE -9 -c > $SYNC_DB_SOURCE_DUMP_FILE"
 
     lando_yellow "Dumping database to $SYNC_DB_TARGET_DUMP_FILE"
-    eval "ssh -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump --compress $SYNC_DB_TARGET_CRED $SYNC_DB_DUMP_PARAMS | gzip -9 -c\" > $SYNC_DB_TARGET_DUMP_FILE"
+    eval "ssh $SYNC_VERBOSE -C $SYNC_SSH_USER@$SYNC_SERVER \"mysqldump $SYNC_VERBOSE --compress $SYNC_DB_TARGET_CRED $SYNC_DB_DUMP_PARAMS | gzip $SYNC_VERBOSE -9 -c\" > $SYNC_DB_TARGET_DUMP_FILE"
 
     lando_pink "Importing database"
-    eval "scp $SYNC_DB_SOURCE_DUMP_FILE $SYNC_SSH_USER@$SYNC_SERVER:~/"
-    eval "ssh $SYNC_SSH_USER@$SYNC_SERVER \"gunzip -c < $SYNC_DB_SOURCE_DUMP_FILE | mysql $SYNC_DB_TARGET_CRED\""
-    eval "ssh $SYNC_SSH_USER@$SYNC_SERVER \"rm $SYNC_DB_SOURCE_DUMP_FILE\""
+    eval "scp $SYNC_VERBOSE $SYNC_DB_SOURCE_DUMP_FILE $SYNC_SSH_USER@$SYNC_SERVER:~/"
+    eval "ssh $SYNC_VERBOSE $SYNC_SSH_USER@$SYNC_SERVER \"gunzip $SYNC_VERBOSE -c < $SYNC_DB_SOURCE_DUMP_FILE | mysql $SYNC_VERBOSE $SYNC_DB_TARGET_CRED\""
+    eval "ssh $SYNC_VERBOSE $SYNC_SSH_USER@$SYNC_SERVER \"rm $SYNC_DB_SOURCE_DUMP_FILE\""
   fi
 
   if [ "$SYNC_DO_FILES_SYNC" == "true" ]; then
     for i in "${!SYNC_FILES_SOURCE_PATHS[@]}"; do
       if [ "$SYNC_REMOTE_HAS_RSYNC" == "true" ]; then
         lando_pink "Rsync ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
-        eval "rsync --chown=$SYNC_REMOTE_FILES_RSYNC_CHOWN --chmod=$SYNC_REMOTE_FILES_RSYNC_CHMOD -a --info=progress2 --delete --rsync-path=\"$SYNC_REMOTE_USE_SUDO rsync\" -e ssh ${SYNC_FILES_SOURCE_PATHS[i]} $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_TARGET_PATHS[i]}"
+        eval "rsync $SYNC_VERBOSE --chown=$SYNC_REMOTE_FILES_RSYNC_CHOWN --chmod=$SYNC_REMOTE_FILES_RSYNC_CHMOD -a --info=progress2 --delete --rsync-path=\"$SYNC_REMOTE_USE_SUDO rsync\" -e ssh $SYNC_VERBOSE ${SYNC_FILES_SOURCE_PATHS[i]} $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_TARGET_PATHS[i]}"
       else
         lando_pink "Remove ${SYNC_FILES_TARGET_PATHS[i]}"
-        eval "ssh $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO rm -rf ${SYNC_FILES_TARGET_PATHS[i]}'"
+        eval "ssh $SYNC_VERBOSE $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO rm -rf ${SYNC_FILES_TARGET_PATHS[i]}'"
         lando_pink "Scp ${SYNC_FILES_SOURCE_PATHS[i]} to ${SYNC_FILES_TARGET_PATHS[i]}"
-        eval "scp -rCq ${SYNC_FILES_SOURCE_PATHS[i]} $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_TARGET_PATHS[i]}"
+        eval "scp $SYNC_VERBOSE -rCq ${SYNC_FILES_SOURCE_PATHS[i]} $SYNC_SSH_USER@$SYNC_SERVER:${SYNC_FILES_TARGET_PATHS[i]}"
       fi
     done
   fi
 
   if [ ! -z "$SYNC_MIGRATION_CMD" ] && [ "$SYNC_DO_MIGRATION" == "true" ]; then
     lando_pink "Run migration in $SYNC_PROJECT_PATH"
-    eval "ssh $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO ${SYNC_PHP_BINARY} ${SYNC_PROJECT_PATH}${SYNC_MIGRATION_CMD}'"
+    eval "ssh $SYNC_VERBOSE $SYNC_SSH_USER@$SYNC_SERVER '$SYNC_REMOTE_USE_SUDO ${SYNC_PHP_BINARY} ${SYNC_PROJECT_PATH}${SYNC_MIGRATION_CMD}'"
   fi
 
   lando_green "Utinni!"
@@ -319,6 +319,10 @@ while (("$#")); do
     ;;
   --no-migration)
     SYNC_DO_MIGRATION=false
+    shift
+    ;;
+  -v)
+    SYNC_VERBOSE='-v'
     shift
     ;;
   *)

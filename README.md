@@ -8,16 +8,16 @@ This is a plugin for https://github.com/lando/lando.
 
 Clone the repository to your plugins directory:
 ```
-git clone git@github.com:eikona-media/lando-eimed-toolkit.git ~/.lando/plugins/lando-eimed-toolkit
+git clone git@github.com:eikona-media/lando-eimed-toolkit.git ~/.lando/plugins/lando_eimed_toolkit
 ```
 or clone with https:
 ```
-git clone https://github.com/eikona-media/lando-eimed-toolkit.git ~/.lando/plugins/lando-eimed-toolkit
+git clone https://github.com/eikona-media/lando-eimed-toolkit.git ~/.lando/plugins/lando_eimed_toolkit
 ```
 
 Copy the configuration [sync.env](scripts/sync.env) to your project:
 ```
-cp ~/.lando/plugins/lando-eimed-toolkit/scripts/sync.env [project_dir]/.lando/sync.env
+cp ~/.lando/plugins/lando_eimed_toolkit/scripts/sync.env [project_dir]/.lando/sync.env
 ```
 Remove all active default variables which you don't want to overwrite.
 **Uncomment all inactive variables and configure them to use the sync!**
@@ -45,3 +45,11 @@ services:
                 SYNC_SSH_USER: "xxxxx"
                 SYNC_REMOTE_USE_SUDO: ""
 ````
+
+## Known issues
+
+If you have installed the plugin in `~/.lando/plugins/lando-eimed-toolkit` you should rename the path because of https://github.com/lando/lando/issues/3394
+
+```
+mv ~/.lando/plugins/lando-eimed-toolkit ~/.lando/plugins/lando_eimed_toolkit
+```
